@@ -1,0 +1,94 @@
+server:
+  port: 8080
+  servlet:
+    context-path:
+
+spring:
+  # dev|prod
+  profiles:
+    active: dev
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy年MM月dd日 HH:mm:ss
+    serialization:
+      indent_output: true
+      WRITE_DATES_AS_TIMESTAMPS: false
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+  aop:
+    auto: true
+  devtools:
+    livereload:
+      enabled: true #是否支持livereload
+    restart:
+      enabled: true #是否支持热部署
+  liquibase:
+    enabled: true
+    change-log: classpath:/liquibase/index.xml
+  datasource:
+    #数据库连接池类型
+    type: com.alibaba.druid.pool.DruidDataSource
+    #初始化连接个数,最小活跃连接个数,最大连接个数
+    druid:
+      initial-size: 2
+      maxActive: 20
+      maxWait: 60000
+      timeBetweenEvictionRunsMillis: 60000
+      minEvic tableIdleTimeMillis: 30000
+      validationQuery: select 'x'
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      poolPreparedStatements: true
+      maxPoolPreparedStatementPerConnectionSize: 20
+      filters: stat,wall,slf4j
+      connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=1
+      useGlobalDataSourceStat: true
+      stat-view-servlet:
+        login-username: blank
+        login-password: ENC(HZnYD9JFv+CUOwqSb6+mIPZzPsHELasB)
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**Mapper.xml
+  global-config:
+    db-config:
+      logic-delete-value: 1 # 逻辑已删除值(默认为 1)
+      logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
+      table-prefix: t_
+
+jasypt:
+  encryptor:
+    password: blank
+
+##输出sql
+logging:
+  level:
+    com.gddlkj.example.mapper: debug
+    io.swagger.models.parameters.AbstractSerializableParameter: error
+    springfox:
+      documentation:
+        spring:
+          web:
+            readers:
+              operation:
+                CachingOperationNameGenerator: error
+
+jwt:
+  token:
+    # hour
+    expiration-time: 24
+    secret: @project.name@
+    token-prefix: Bearer
+    header-string: Authorization
+
+cos:
+  secretId: AKID4wZLr9j6lBMIE
+  secretKey: itro22ozvc074lE
+  bucketName:  zftx-1300073014
+  cdnPath: http://zftx-1300073014.file.myqcloud.com
+
+project:
+  name: @project.name@ # 禁止修改
+

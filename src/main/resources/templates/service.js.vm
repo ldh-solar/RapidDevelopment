@@ -1,0 +1,52 @@
+import request from '@/utils/request';
+
+const list = (current, size, sort) => {
+  let asc = null;
+  let desc = null;
+  if (sort.order === 'ascending') {
+    asc = sort.prop.replace(/([A-Z])/g, '_$1').toLowerCase();
+  }
+  if (sort.order === 'descending') {
+    desc = sort.prop.replace(/([A-Z])/g, '_$1').toLowerCase();
+  }
+  return request({
+    url: '/admin/${table.entityPath}',
+    method: 'get',
+    params: {
+      asc,
+      desc,
+      size,
+      current,
+    },
+  });
+};
+
+const add = (${table.entityPath}) => request({
+  url: '/admin/${table.entityPath}',
+  method: 'post',
+  data: ${table.entityPath},
+});
+
+const update = (${table.entityPath}) => request({
+  url: '/admin/${table.entityPath}',
+  method: 'put',
+  data: ${table.entityPath},
+});
+
+const remove = (id) => request({
+  url: `/admin/${table.entityPath}/${id}`,
+  method: 'delete',
+});
+
+const get = (id) => request({
+  url: `/admin/${table.entityPath}/${id}`,
+  method: 'get',
+});
+
+export default {
+  add,
+  list,
+  update,
+  get,
+  remove,
+};

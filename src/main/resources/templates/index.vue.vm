@@ -1,0 +1,128 @@
+<template>
+  <div class="app-container">
+    <el-row type="flex" justify="space-between" style="margin-bottom: 10px">
+      <el-col>
+        <el-button-group>
+          <el-button type="primary" @click="handleAdd">新增</el-button>
+        </el-button-group>
+      </el-col>
+      <el-col :span="8">
+        <el-input v-model="tableData.keyWord" placeholder="请输入内容">
+          <el-button slot="append" icon="el-icon-search" @click="fetchData" />
+        </el-input>
+      </el-col>
+    </el-row>
+
+    <data-tables-server
+      :table-props="calc('270px')"
+      :data="tableData.list"
+      :total="tableData.total"
+      :loading="tableData.loading"
+      @query-change="tableChange"
+    >
+      #foreach($field in ${table.fields})
+      <el-table-column
+        align="center"
+        label="#if(${field.comment}) ${field.comment} #else ${field.propertyName} #end"
+        prop="${field.propertyName}"
+        width="95"
+      />
+      #end
+      <el-table-column label="操作" fixed="right" class-name="divider-handle" width="150">
+        <template slot-scope="scope">
+          <el-button
+            type="text"
+            @click="handleEdit(scope.$index, scope.row)"
+          >编辑
+          </el-button>
+          <el-divider direction="vertical" />
+          <el-button
+            type="text"
+            @click="handleRemove(scope.$index, scope.row)"
+          >删除
+          </el-button>
+        </template>
+      </el-table-column>
+    </data-tables-server>
+
+    <!-- 编辑或新建 -->
+    <edit-dialog :form-data="${table.entityPath}Form" />
+  </div>
+</template>
+
+<script>
+import ${entity}Service from '@/services/${table.entityPath}';
+import EditDialog from './compoment/EditdDialog.vue';
+
+export default {
+  components: {
+    EditDialog,
+  },
+  data() {
+    return {
+      ${table.entityPath}Form: {
+        data: {},
+        visible: false,
+      },
+      // 表格数据
+      tableData: {
+        list: [],
+        total: null,
+        loading: false,
+        page: 1,
+        pageSize: 20,
+      },
+    };
+  },
+  mounted() {
+  },
+  methods: {
+    tableChange(queryInfo) {
+      this.tableData.sort = queryInfo.sort;
+      this.tableData.page = queryInfo.page;
+      this.tableData.pageSize = queryInfo.pageSize;
+      this.fetchData();
+    },
+    /**
+       * 表格分页查询
+       */
+    async fetchData() {
+      this.tableData.loading = true;
+      const { data } = await ${entity}Service
+        .list(
+          this.tableData.page,
+          this.tableData.pageSize,
+          this.tableData.sort,
+        );
+      this.tableData.list = data.records;
+      this.tableData.total = data.total;
+      this.tableData.loading = false;
+    },
+    async handleRemove(index, row) {
+      try {
+        await this.$confirm('此操作将删除该${entity}, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+        });
+        await ${entity}Service.remove(row.id);
+        this.$notify.success({ title: '成功', message: '删除成功', duration: 2500 });
+        await this.fetchData();
+      } catch (e) {
+        this.$notify.info('已取消删除');
+      }
+    },
+    handleAdd() {
+      this.${table.entityPath}Form.data.id = null;
+      this.${table.entityPath}Form.visible = true;
+    },
+    handleEdit(index, row) {
+      this.${table.entityPath}Form.data.id = row.id;
+      this.${table.entityPath}Form.visible = true;
+    },
+  },
+};
+</script>
+<style type="text/scss" lang="scss" scoped>
+
+</style>

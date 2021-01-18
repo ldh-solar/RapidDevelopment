@@ -1,0 +1,91 @@
+package ${package.Controller};
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.*;
+import javax.annotation.Resource;
+import javax.validation.Valid;
+
+import ${package.Entity}.${entity};
+import ${package.Service}.${table.serviceName};
+import com.gddlkj.example.model.dto.MyPage;
+import com.gddlkj.example.model.dto.R;
+#if(${restControllerStyle})
+import org.springframework.web.bind.annotation.RestController;
+#else
+import org.springframework.stereotype.Controller;
+#end
+#if(${superControllerClassPackage})
+import ${superControllerClassPackage};
+#end
+
+
+/**
+ * <p>
+ * $!{table.comment} 前端控制器
+ * </p>
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+#if(${restControllerStyle})
+@RestController
+#else
+@Controller
+#end
+@Slf4j
+@Api(tags = "$!{table.comment}")
+@RequestMapping("admin#if(${package.ModuleName})/${package.ModuleName}#end/#if(${controllerMappingHyphenStyle})${controllerMappingHyphen}#else${table.entityPath}#end")
+#if(${kotlin})
+class ${table.controllerName}#if(${superControllerClass}) : ${superControllerClass}()#end
+
+#else
+#if(${superControllerClass})
+public class ${table.controllerName} extends ${superControllerClass} {
+#else
+public class ${table.controllerName} {
+#end
+
+   @Resource
+   private ${table.serviceName} ${table.entityPath}Service;
+
+   @GetMapping()
+   @ApiOperation(value="分页查询$!{table.comment}")
+   public R<IPage<${entity}>> listByPage(MyPage<${entity}> myPage){
+         return success(${table.entityPath}Service.page(myPage.convertToPage()));
+   }
+
+   @GetMapping("/{id}")
+   @ApiOperation(value="根据ID获取$!{table.comment}")
+   public R<${entity}> selectById(@PathVariable Long id){
+         return success(${table.entityPath}Service.getById(id));
+   }
+
+   @DeleteMapping("/{id}")
+   @ApiOperation(value="根据ID删除$!{table.comment}")
+   public R delete(@PathVariable Long id){
+         return success(${table.entityPath}Service.removeById(id));
+   }
+
+   @PutMapping()
+   @ApiOperation(value="更新一条$!{table.comment}记录")
+   public R update(@Valid @RequestBody ${entity} ${table.entityPath}){
+         return success(${table.entityPath}Service.updateById(${table.entityPath}));
+   }
+
+   @PostMapping()
+   @ApiOperation(value="新增一条$!{table.comment}记录")
+   public R save(@Valid @RequestBody ${entity} ${table.entityPath}){
+         return success(${table.entityPath}Service.save(${table.entityPath}));
+   }
+
+}
+
+#end
